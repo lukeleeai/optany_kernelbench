@@ -27,7 +27,8 @@ bash scripts/bootstrap.sh
 cp config/env.example .env && $EDITOR .env   # OPENAI_API_KEY
 set -a && source .env && set +a
 python -m experiments.kernelbench.main --help
-bash scripts/smoke_test.sh# Optional API check (small cost): bash scripts/smoke_test.sh --ping-openai
+bash scripts/smoke_test.sh
+# Optional API check (small cost): bash scripts/smoke_test.sh --ping-openai
 ```
 
 Private repo: use a GitHub **PAT** as the HTTPS password or `gh auth login`.
