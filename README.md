@@ -31,6 +31,17 @@ bash scripts/smoke_test.sh
 # Optional API check (small cost): bash scripts/smoke_test.sh --ping-openai
 ```
 
+**Stronger checks (still not a full GEPA run):**
+
+```bash
+bash scripts/verify_all.sh              # smoke + test_setup + run_test (JIT CUDA on GPU)
+bash scripts/verify_all.sh --scoring    # + test_scoring_e2e (more compile time)
+```
+
+- **`test_setup`** — imports, `compute_score`, `extract_code`, dataset load from `KernelBench/`.
+- **`run_test`** — real **`load_inline`** compile, correct kernel, subprocess crash isolation, compile-failure path.
+- **`test_scoring_e2e`** — several kernel variants; checks the score ordering (optional; slowest).
+
 Private repo: use a GitHub **PAT** as the HTTPS password or `gh auth login`.
 
 **H100 / newer CUDA:** before `bootstrap.sh`, e.g. `export TORCH_INDEX_URL=https://download.pytorch.org/whl/cu126`.
