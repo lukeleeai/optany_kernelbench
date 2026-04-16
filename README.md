@@ -46,7 +46,15 @@ Private repo: use a GitHub **PAT** as the HTTPS password or `gh auth login`.
 
 **H100 / newer CUDA:** before `bootstrap.sh`, e.g. `export TORCH_INDEX_URL=https://download.pytorch.org/whl/cu126`.
 
-**Baselines:** `eval.py` looks under `experiments/kernelbench/KernelBench/results/timing/<hw>/`. On new hardware, generate or copy `baseline_time_torch.json` for that GPU name.
+**Baselines:** `eval.py` picks `…/results/timing/<hw>/baseline_time_torch.json` in this order:
+
+1. **`KERNELBENCH_BASELINE_HW`** — exact folder name, e.g. `H100_PCIe_LambdaLabs` or `H100_Modal`.
+2. **Auto-detect** — `nvidia-smi` name of visible GPU 0 (`H100` → H100 JSON, `V100` → V100 JSON).
+3. **Legacy** — first on-disk match in a fixed list (so old behavior if detection fails).
+
+Add to `.env` if you need to force a JSON: `KERNELBENCH_BASELINE_HW=H100_PCIe_LambdaLabs`.
+
+On **new** hardware, add a `baseline_time_torch.json` under a new `<hw>` subfolder and set **`KERNELBENCH_BASELINE_HW`** (or extend the heuristics in `eval.py`).
 
 ## Two nodes (8 GPUs each)
 

@@ -37,13 +37,75 @@ def init_gpu_manager(device_list: list[int] | None = None, lock_dir: str = ".gpu
 # Paths - KernelBench is now in the same directory
 KERNELBENCH_ROOT = Path(__file__).parent / "KernelBench"
 
+# Subdirs under KernelBench/results/timing/<hw>/baseline_time_torch.json
+_BASELINE_HW_FALLBACK_ORDER = (
+    "Tesla-V100-SXM2-32GB-LS",
+    "V100-SXM2-32GB-LS",
+    "H100_PCIe_LambdaLabs",
+    "H100_Modal",
+)
+
+
+def _query_first_visible_gpu_name() -> str | None:
+    """Name of GPU index 0 in the current visibility set (respects CUDA_VISIBLE_DEVICES)."""
+    try:
+        r = subprocess.run(
+            ["nvidia-smi", "-i", "0", "--query-gpu=name", "--format=csv,noheader"],
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+        if r.returncode != 0 or not (r.stdout or "").strip():
+            return None
+        return (r.stdout.strip().splitlines()[0] or "").strip() or None
+    except (OSError, subprocess.SubprocessError, IndexError):
+        return None
+
+
+def _baseline_hw_dirs_for_gpu_name(gpu_name: str | None) -> tuple[str, ...]:
+    """Map nvidia-smi GPU name to timing subdir names (first match with an on-disk file wins)."""
+    if not gpu_name:
+        return ()
+    u = gpu_name.upper()
+    if "H100" in u:
+        return ("H100_PCIe_LambdaLabs", "H100_Modal")
+    if "V100" in u:
+        return ("Tesla-V100-SXM2-32GB-LS", "V100-SXM2-32GB-LS")
+    return ()
+
 
 def _get_baseline_path() -> Path:
-    """Find baseline times file for current hardware."""
+    """Find baseline times file for current hardware.
+
+    Resolution order:
+    1. ``KERNELBENCH_BASELINE_HW`` — exact subdirectory name under ``results/timing/``
+       (e.g. ``H100_PCIe_LambdaLabs``). If set but file missing, falls through with a warning.
+    2. First visible GPU from ``nvidia-smi`` (index 0) — H100 vs V100 heuristics.
+    3. First on-disk match in ``_BASELINE_HW_FALLBACK_ORDER`` (legacy).
+    4. Default path (may not exist).
+    """
     timing_dir = KERNELBENCH_ROOT / "results" / "timing"
-    for hw in ("Tesla-V100-SXM2-32GB-LS", "V100-SXM2-32GB-LS", "H100_PCIe_LambdaLabs", "H100_Modal"):
+
+    override = (os.environ.get("KERNELBENCH_BASELINE_HW") or "").strip()
+    if override:
+        p = timing_dir / override / "baseline_time_torch.json"
+        if p.is_file():
+            return p
+        print(
+            f"[eval] WARN: KERNELBENCH_BASELINE_HW={override!r} but {p} missing; "
+            "trying auto-detect / fallback.",
+            flush=True,
+        )
+
+    gpu_name = _query_first_visible_gpu_name()
+    for hw in _baseline_hw_dirs_for_gpu_name(gpu_name):
         path = timing_dir / hw / "baseline_time_torch.json"
-        if path.exists():
+        if path.is_file():
+            return path
+
+    for hw in _BASELINE_HW_FALLBACK_ORDER:
+        path = timing_dir / hw / "baseline_time_torch.json"
+        if path.is_file():
             return path
     return timing_dir / "H100_PCIe_LambdaLabs" / "baseline_time_torch.json"
 
