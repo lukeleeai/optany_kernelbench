@@ -8,16 +8,36 @@ Portable slice of the KernelBench + GEPA (“optimize anything”) experiment st
 2. **Multi-task (MT10/MT20) stays on one node** — One `experiments.kernelbench.main` process expects **shared GPU locks under one `outputs/.../run_dir`**. Do **not** split a single MT10 run across two nodes without new distributed coordination.
 3. **Use two nodes for parallelism** by running **different** jobs: e.g. ST shard A vs ST shard B, two seeds, MT10 on node0 and a long ST sweep on node 1, or two disjoint problem lists.
 
-## Quick start (on a fresh machine)
+## Paths: dev box vs compute cluster
+
+- **`sync_from_gepa_luke.sh` only runs where `gepa_luke` (or a copy of it) actually lives** — e.g. your current cluster under `/data/lukedhlee/gepa_luke`.
+- **Other clusters (e.g. 2× H100 nodes) often have no `/data/lukedhlee/` at all.** There you **do not** run sync; you **`git clone`** this repo after it already contains `experiments/` and `external/` (committed or released), then **`bootstrap.sh`**.
+
+## Quick start
+
+### A — Update the bundle from `gepa_luke` (one machine that has the monorepo)
 
 ```bash
-cd /data/lukedhlee/optany_kernelbench
-export SOURCE_REPO="${SOURCE_REPO:-/data/lukedhlee/gepa_luke}"
+cd /path/to/optany_kernelbench
+export SOURCE_REPO=/path/to/gepa_luke    # e.g. /data/lukedhlee/gepa_luke on that host only
 bash scripts/sync_from_gepa_luke.sh
 bash scripts/bootstrap.sh
-cp config/env.example .env   # edit: API keys, optional DSPY_CACHEDIR
+git add experiments external run_with_GPUs.py scripts/experiments
+git commit -m "Sync from gepa_luke" && git push   # optional: ship to GitHub for other clusters
+```
+
+### B — H100 / remote nodes (no `gepa_luke`, no `/data/lukedhlee`)
+
+```bash
+cd $HOME   # or your project root on that cluster
+git clone git@github.com:lukeleeai/optany_kernelbench.git
+cd optany_kernelbench
+bash scripts/bootstrap.sh
+cp config/env.example .env && vim .env
 set -a && source .env && set +a
 ```
+
+Do **not** assume `/data/lukedhlee/optany_kernelbench` exists on those nodes; use wherever you clone.
 
 Smoke test:
 

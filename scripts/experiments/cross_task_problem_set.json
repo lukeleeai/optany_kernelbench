@@ -1,0 +1,41 @@
+{
+  "schema": "cross_task_problem_set_v1",
+  "created_utc": "2026-04-16T00:16:35.061765+00:00",
+  "seed": 1482937462,
+  "pool_size": 31,
+  "twenty": [
+    "11_VGG16.py",
+    "18_Matmul_with_transposed_both.py",
+    "1_Conv2D_ReLU_BiasAdd.py",
+    "1_MLP.py",
+    "1_Square_matrix_multiplication_.py",
+    "21_EfficientNetMBConv.py",
+    "2_ConvTranspose2d_BiasAdd_Clamp_Scaling_Clamp_Divide.py",
+    "33_BatchNorm.py",
+    "33_VanillaRNN.py",
+    "3_Batched_matrix_multiplication.py",
+    "40_LayerNorm.py",
+    "42_Max_Pooling_2D.py",
+    "54_conv_standard_3D__square_input__square_kernel.py",
+    "57_conv_transposed_2D__square_input__square_kernel.py",
+    "5_AlexNet.py",
+    "65_conv_transposed_2D__square_input__asymmetric_kernel.py",
+    "6_Matmul_with_large_K_dimension_.py",
+    "82_conv_depthwise_2D_square_input_square_kernel.py",
+    "86_conv_depthwise_separable_2D.py",
+    "8_ResNetBasicBlock.py"
+  ],
+  "ten": [
+    "11_VGG16.py",
+    "18_Matmul_with_transposed_both.py",
+    "1_Conv2D_ReLU_BiasAdd.py",
+    "1_MLP.py",
+    "1_Square_matrix_multiplication_.py",
+    "2_ConvTranspose2d_BiasAdd_Clamp_Scaling_Clamp_Divide.py",
+    "33_BatchNorm.py",
+    "33_VanillaRNN.py",
+    "42_Max_Pooling_2D.py",
+    "65_conv_transposed_2D__square_input__asymmetric_kernel.py"
+  ],
+  "ten_subset_of_twenty": true
+}

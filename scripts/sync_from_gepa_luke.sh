@@ -1,11 +1,17 @@
 #!/usr/bin/env bash
 # Copy a minimal working tree from the full gepa_luke repo into this bundle.
+# Run ONLY on a machine that actually has that monorepo. H100 nodes usually do not
+# have /data/lukedhlee — sync on your dev box, commit/push, then clone on the cluster.
 set -euo pipefail
 DEST="$(cd "$(dirname "$0")/.." && pwd)"
-SOURCE="${SOURCE_REPO:-/data/lukedhlee/gepa_luke}"
+SOURCE="${SOURCE_REPO:?Set SOURCE_REPO to the gepa_luke root (no default — not portable across clusters)}"
 
 if [[ ! -d "$SOURCE/experiments/kernelbench" ]]; then
-  echo "SOURCE_REPO must point at gepa_luke root; got: $SOURCE"
+  echo "Cannot find gepa_luke at: $SOURCE"
+  echo "Set SOURCE_REPO to the monorepo root on THIS host, e.g.:"
+  echo "  export SOURCE_REPO=/path/to/gepa_luke"
+  echo "If you are on a cluster with no gepa_luke tree, skip this script: clone optany_kernelbench"
+  echo "after experiments/ + external/ are already in git (or rsync a tarball from a machine that ran sync)."
   exit 1
 fi
 
