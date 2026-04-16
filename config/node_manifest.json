@@ -1,0 +1,15 @@
+{
+  "description": "Parallel ST-style shards on two nodes (edit commands as needed). Do NOT run MT10 on node0 and MT20 on node1 at the same time if you need sequential MT10→MT20 on one lineage.",
+  "nodes": [
+    {
+      "rank": 0,
+      "cuda_visible_devices": "0,1,2,3,4,5,6,7",
+      "command": "source .venv/bin/activate && python -m experiments.kernelbench.main --levels level1 --problems \"$(cat config/shards/twenty_shard_0.csv)\" --max-metric-calls 30 --max-refinements 1 --frontier-type instance --parallel --gpus 8 --run-name h100_st_shard0"
+    },
+    {
+      "rank": 1,
+      "cuda_visible_devices": "0,1,2,3,4,5,6,7",
+      "command": "source .venv/bin/activate && python -m experiments.kernelbench.main --levels level1 --problems \"$(cat config/shards/twenty_shard_1.csv)\" --max-metric-calls 30 --max-refinements 1 --frontier-type instance --parallel --gpus 8 --run-name h100_st_shard1"
+    }
+  ]
+}

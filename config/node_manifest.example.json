@@ -1,0 +1,15 @@
+{
+  "description": "Copy to node_manifest.json. Each node runs ONE entry matching NODE_RANK. Commands are shell snippets from repo root with .venv activated.",
+  "nodes": [
+    {
+      "rank": 0,
+      "cuda_visible_devices": "0,1,2,3,4,5,6,7",
+      "command": "echo 'Replace with real job, e.g. ST shard A or MT10 run A'"
+    },
+    {
+      "rank": 1,
+      "cuda_visible_devices": "0,1,2,3,4,5,6,7",
+      "command": "echo 'Replace with real job, e.g. ST shard B or a different experiment'"
+    }
+  ]
+}
