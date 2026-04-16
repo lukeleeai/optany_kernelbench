@@ -1,13 +1,21 @@
 #!/usr/bin/env bash
-# Run the job for this machine's NODE_RANK using config/node_manifest.json.
-# Usage on node A: NODE_RANK=0 bash scripts/run_node_manifest.sh
-# Usage on node B: NODE_RANK=1 bash scripts/run_node_manifest.sh
+# Run the job for NODE_RANK from config/node_manifest.json (CUDA + command).
+# Usage: NODE_RANK=0 bash scripts/run_node_manifest.sh
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$ROOT"
 
-RANK="${NODE_RANK:?Set NODE_RANK to 0 or 1 (or edit script for more ranks)}"
+RANK="${NODE_RANK:?Set NODE_RANK (e.g. 0 or 1)}"
 MANIFEST="${NODE_MANIFEST:-$ROOT/config/node_manifest.json}"
+
+if [[ ! -f "$MANIFEST" ]]; then
+  echo "Missing manifest: $MANIFEST"
+  exit 1
+fi
+if [[ ! -f "$ROOT/.venv/bin/activate" ]]; then
+  echo "No .venv — run: bash scripts/bootstrap.sh"
+  exit 1
+fi
 
 export PYTHONUNBUFFERED=1
 export MANIFEST
@@ -26,4 +34,7 @@ PY
 
 echo "[run_node_manifest] NODE_RANK=$RANK CUDA_VISIBLE_DEVICES=$CUDA_VISIBLE_DEVICES"
 echo "[run_node_manifest] $CMD"
-bash -c "$CMD"
+# shellcheck disable=SC1091
+source "$ROOT/.venv/bin/activate"
+cd "$ROOT"
+exec bash -c "$CMD"
