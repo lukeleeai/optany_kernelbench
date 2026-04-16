@@ -30,7 +30,7 @@ git commit -m "Sync from gepa_luke" && git push   # optional: ship to GitHub for
 
 ```bash
 cd $HOME   # or your project root on that cluster
-git clone git@github.com:lukeleeai/optany_kernelbench.git
+git clone https://github.com/lukeleeai/optany_kernelbench.git
 cd optany_kernelbench
 bash scripts/bootstrap.sh
 cp config/env.example .env && vim .env
@@ -38,6 +38,8 @@ set -a && source .env && set +a
 ```
 
 Do **not** assume `/data/lukedhlee/optany_kernelbench` exists on those nodes; use wherever you clone.
+
+If the repo is **private**, HTTPS clone needs credentials (e.g. GitHub **personal access token** as the password, or `gh auth login`).
 
 Smoke test:
 
